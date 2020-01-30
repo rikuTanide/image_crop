@@ -603,7 +603,7 @@ class _CropPainter extends CustomPainter {
       var pa = Paint()
         ..blendMode = BlendMode.clear;
 
-      canvas.drawRect(rect, paint);
+      canvas.drawRect(Rect.fromLTRB(0.0, 0.0, rect.width, rect.bottom), paint);
       canvas.drawCircle(boundaries.center, boundaries.height / 2, pa);
       canvas.restore();
     }
@@ -669,32 +669,38 @@ class _CropPainter extends CustomPainter {
       ..color = _kCropGridColor.withOpacity(_kCropGridColor.opacity * active)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
+    if(shape == Shape.rectangle) {
+      final path = Path()
+        ..moveTo(boundaries.left, boundaries.top)
+        ..lineTo(boundaries.right, boundaries.top)..lineTo(
+            boundaries.right, boundaries.bottom)..lineTo(
+            boundaries.left, boundaries.bottom)..lineTo(
+            boundaries.left, boundaries.top);
 
-    final path = Path()
-      ..moveTo(boundaries.left, boundaries.top)
-      ..lineTo(boundaries.right, boundaries.top)
-      ..lineTo(boundaries.right, boundaries.bottom)
-      ..lineTo(boundaries.left, boundaries.bottom)
-      ..lineTo(boundaries.left, boundaries.top);
+      for (var column = 1; column < _kCropGridColumnCount; column++) {
+        path
+          ..moveTo(
+              boundaries.left + column * boundaries.width / _kCropGridColumnCount,
+              boundaries.top)
+          ..lineTo(
+              boundaries.left + column * boundaries.width / _kCropGridColumnCount,
+              boundaries.bottom);
+      }
 
-    for (var column = 1; column < _kCropGridColumnCount; column++) {
-      path
-        ..moveTo(
-            boundaries.left + column * boundaries.width / _kCropGridColumnCount,
-            boundaries.top)
-        ..lineTo(
-            boundaries.left + column * boundaries.width / _kCropGridColumnCount,
-            boundaries.bottom);
+      for (var row = 1; row < _kCropGridRowCount; row++) {
+        path
+          ..moveTo(boundaries.left,
+              boundaries.top + row * boundaries.height / _kCropGridRowCount)
+          ..lineTo(boundaries.right,
+              boundaries.top + row * boundaries.height / _kCropGridRowCount);
+      }
+
+      canvas.drawPath(path, paint);
+    } else {
+      final path = Path()
+        ..addOval(boundaries);
+      canvas.drawPath(path, paint);
+
     }
-
-    for (var row = 1; row < _kCropGridRowCount; row++) {
-      path
-        ..moveTo(boundaries.left,
-            boundaries.top + row * boundaries.height / _kCropGridRowCount)
-        ..lineTo(boundaries.right,
-            boundaries.top + row * boundaries.height / _kCropGridRowCount);
-    }
-
-    canvas.drawPath(path, paint);
   }
 }
