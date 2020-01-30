@@ -1,6 +1,7 @@
 library image_crop;
 
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:math';
 import 'dart:ui' as ui;
